@@ -36,20 +36,26 @@ server {
   # Static assets server.
   location / {
     proxy_http_version 1.1;
-    proxy_set_header Host $host;
+    proxy_set_header Host ${FRONTEND_HOST}:${FRONTEND_PORT};
 
     set $prerender 0;
 
-    # Pre-rendering for search engines crawlers.
+    # Pre-renders only for search engines crawlers.
     if ($http_user_agent ~* "${BOT_USER_AGENTS}") {
       set $prerender 1;
     }
 
-    # Skip pre-rendering static assets.
+    # Skips pre-rendering static assets.
     if (-f $request_filename) {
       set $prerender 0;
     }
 
+    # Prevents showing sourcemaps in production.
+    if ($request_filename ~* .map$){
+      rewrite ^ /index.html;
+    }
+
+    # Forwards to pre-rendering service when needed.
     if ($prerender = 1) {
       proxy_pass http://${PRERENDERER_HOST}:${PRERENDERER_PORT};
       break;
