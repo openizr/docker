@@ -44,7 +44,7 @@ export default {
         queuedRequests.push(queueRequest(request));
       }
     });
-    await page.goto(`http://${_request.headers.host}${_request.url}`);
+    await page.goto(`http://${(_request.headers.host || 'localhost')}${_request.url}`);
     await Promise.all(queuedRequests);
     const content = (await page.content()).replace(/(<script[^>]*>[^<]*<\/script>)/ig, '');
     await browser.close();
