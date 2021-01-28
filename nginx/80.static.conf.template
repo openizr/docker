@@ -5,7 +5,7 @@ server {
   server_tokens off;
 
   # Back-end server.
-  location /api  {
+  location @backend  {
     # Security settings.
     add_header 'Expect-CT' 'max-age=0' always;
     add_header 'X-Frame-Options' 'SAMEORIGIN' always;
@@ -14,7 +14,7 @@ server {
     add_header 'X-Content-Type-Options' 'nosniff' always;
     add_header 'X-Permitted-Cross-Domain-Policies' 'none' always;
     add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
-    add_header 'Content-Security-Policy' 'default-src \'self\';base-uri \'self\';block-all-mixed-content;font-src \'self\' https: data:;frame-ancestors \'self\';img-src \'self\' data:;object-src \'none\';script-src \'self\';script-src-attr \'none\';style-src \'self\' https: \'unsafe-inline\';upgrade-insecure-requests' always;
+    add_header 'Content-Security-Policy' 'default-src \'self\';base-uri \'self\';block-all-mixed-content;font-src \'self\' https: data:;frame-ancestors \'self\';img-src \'self\' https: data:;object-src \'none\';script-src \'self\';script-src-attr \'none\';style-src \'self\' https: \'unsafe-inline\';upgrade-insecure-requests' always;
 
     # CORS settings.
     add_header 'Access-Control-Allow-Origin' '${CORS_ALLOWED_ORIGINS}' always;
@@ -33,24 +33,10 @@ server {
     proxy_http_version 1.1;
   }
 
-  # Front-end server.
-  location @frontend {
-    proxy_http_version 1.1;
-    proxy_set_header Host ${FRONTEND_HOST}:${FRONTEND_PORT};
-
-    # Pre-renders only for search engines crawlers.
-    if ($http_user_agent ~* "${BOT_USER_AGENTS}") {
-      proxy_pass http://${PRERENDERER_HOST}:${PRERENDERER_PORT};
-      break;
-    }
-
-    try_files /var/www/html/public/index.html =404;
-  }
-
   # Static assets server.
   location / {
     access_log off;
-    try_files $uri @frontend;
+    try_files $uri @backend;
     root /var/www/html/public;
     expires 7d;
   }
@@ -58,7 +44,7 @@ server {
   # Prevents showing sourcemaps in production.
   location ~* .map$ {
     access_log off;
-    try_files __ @frontend;
+    try_files __ @backend;
   }
 
   # Front-end healthcheck.
