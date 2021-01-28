@@ -17,11 +17,11 @@ server {
     add_header 'Content-Security-Policy' 'default-src \'self\';base-uri \'self\';block-all-mixed-content;font-src \'self\' https: data:;frame-ancestors \'self\';img-src \'self\' data:;object-src \'none\';script-src \'self\';script-src-attr \'none\';style-src \'self\' https: \'unsafe-inline\';upgrade-insecure-requests' always;
 
     # CORS settings.
-    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Origin' '${CORS_ALLOWED_ORIGINS}' always;
     if ($request_method = 'OPTIONS') {
       add_header 'Content-Length' 0;
       add_header 'Access-Control-Max-Age' 300;
-      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Origin' '${CORS_ALLOWED_ORIGINS}';
       add_header 'Content-Type' 'text/plain charset=UTF-8';
       add_header 'Access-Control-Allow-Credentials' 'true';
       add_header 'Access-Control-Allow-Methods' 'GET,POST,PUT,PATCH,DELETE,OPTIONS';
@@ -33,36 +33,29 @@ server {
     proxy_http_version 1.1;
   }
 
-  # Static assets server.
-  location / {
+  # Front-end server.
+  location @frontend {
     proxy_http_version 1.1;
     proxy_set_header Host ${FRONTEND_HOST}:${FRONTEND_PORT};
 
-    set $prerender 0;
-
     # Pre-renders only for search engines crawlers.
     if ($http_user_agent ~* "${BOT_USER_AGENTS}") {
-      set $prerender 1;
-    }
-
-    # Skips pre-rendering static assets.
-    if (-f $request_filename) {
-      set $prerender 0;
-    }
-
-    # Prevents showing sourcemaps in production.
-    if ($request_filename ~* .map$){
-      rewrite ^ /index.html;
-    }
-
-    # Forwards to pre-rendering service when needed.
-    if ($prerender = 1) {
       proxy_pass http://${PRERENDERER_HOST}:${PRERENDERER_PORT};
       break;
     }
 
-    try_files $uri /index.html =404;
+    try_files /var/www/html/public/index.html =404;
+  }
+
+  # Static assets server.
+  location / {
+    try_files $uri @frontend;
     root /var/www/html/public;
     expires 7d;
+  }
+
+  # Front-end healthcheck.
+  location /health {
+    return 200;
   }
 }
