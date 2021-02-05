@@ -35,7 +35,6 @@ server {
 
   # Static assets server.
   location / {
-    access_log off;
     try_files $uri @backend;
     root /var/www/html/public;
     expires 7d;
