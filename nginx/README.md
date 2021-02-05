@@ -5,7 +5,6 @@ This Docker image is a pre-configured nginx server ready to serve static or dyna
 
 ## Environment variables
 
-- *`ENV`*: environment (development|preproduction|production)
 - *`BACKEND_PORT`*: back-end port to which forward incoming HTTP requests (other than static assets)
 - *`BACKEND_HOST`*: back-end host to which forward incoming HTTP requests (other than static assets)
 - *`FRONTEND_PORT`*: front-end port listening for incoming HTTP requests
