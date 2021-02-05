@@ -14,7 +14,6 @@ server {
     add_header 'X-Content-Type-Options' 'nosniff' always;
     add_header 'X-Permitted-Cross-Domain-Policies' 'none' always;
     add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
-    add_header 'Content-Security-Policy' 'default-src \'self\';base-uri \'self\';block-all-mixed-content;font-src \'self\' https: data:;frame-ancestors \'self\';img-src \'self\' https: data:;object-src \'none\';script-src \'self\';script-src-attr \'none\';style-src \'self\' https: \'unsafe-inline\';upgrade-insecure-requests' always;
 
     # CORS settings.
     add_header 'Access-Control-Allow-Origin' '${CORS_ALLOWED_ORIGINS}' always;
@@ -35,7 +34,6 @@ server {
 
   # Static assets server.
   location / {
-    access_log off;
     try_files $uri @backend;
     root /var/www/html/public;
     expires 7d;
