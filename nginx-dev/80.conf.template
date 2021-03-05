@@ -43,7 +43,8 @@ server {
       break;
     }
 
-    try_files /var/www/html/public/index.html =404;
+    root /var/www/html/public;
+    try_files /index.html =404;
   }
 
   # Static assets server.
