@@ -1,5 +1,7 @@
 FROM node:14-alpine
 
+ENV NODE_ENV=production
+
 # See https://github.com/Yelp/dumb-init.
 RUN dumb_init_url=https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
   wget -O /usr/local/bin/dumb-init $dumb_init_url \
