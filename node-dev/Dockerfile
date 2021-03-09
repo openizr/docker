@@ -4,6 +4,7 @@ ENV NODE_ENV=development
 
 COPY ./docker-entrypoint.sh /usr/local/bin/
 RUN apk add --no-cache openssh-client git
+RUN mkdir -p /root/.ssh
 
 # See https://github.com/Yelp/dumb-init.
 RUN dumb_init_url=https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
