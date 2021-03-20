@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Strict error handling.
+set -eu
+set -o pipefail
+
+# Synchronizes 2 directories in real time.
+while true; do
+  if [ -d "$1" ]; then
+    while inotifywait -r -q -e modify,create,delete,move $1; do
+      rsync -avzq --delete $1 $2 2>/dev/null || true
+    done &>/dev/null
+  fi
+  sleep 3
+done

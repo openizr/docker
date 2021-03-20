@@ -3,7 +3,8 @@ FROM node:14-alpine
 ENV NODE_ENV=development
 
 COPY ./docker-entrypoint.sh /usr/local/bin/
-RUN apk add --no-cache openssh-client git
+COPY ./dsync /usr/local/bin/
+RUN apk add --no-cache openssh-client git inotify-tools rsync
 RUN mkdir -p /root/.ssh
 
 # See https://github.com/Yelp/dumb-init.
