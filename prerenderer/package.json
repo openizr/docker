@@ -1,7 +1,7 @@
 {
   "name": "prerenderer",
   "version": "1.0.0",
-  "description": "Pre-reners dynamically-generated pages for SEO purposes",
+  "description": "Pre-renders dynamically-generated pages for SEO purposes",
   "repository": "https://github.com/openizr/docker",
   "bugs": "https://github.com/openizr/docker/issues",
   "main": "./main.js",
