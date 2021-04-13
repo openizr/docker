@@ -4,9 +4,11 @@
 set -eu
 set -o pipefail
 
-# Synchronizes 2 directories in real time.
+# Synchronizes 2 directories or files in real time.
 while true; do
-  if [ -d "$1" ]; then
+  if [ -d "$1" ] || [ -f "$1" ]; then
+    # We perform a first copy to avoid having to wait for a change on the file / directory.
+    rsync -avzq --delete $1 $2 2>/dev/null || true
     while inotifywait -r -q -e modify,create,delete,move $1; do
       rsync -avzq --delete $1 $2 2>/dev/null || true
     done &>/dev/null
