@@ -11,3 +11,7 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 COPY ./80.conf.template /etc/nginx/templates/80.conf.template
 COPY ./80.static.conf.template /etc/nginx/templates/80.static.conf.template
+
+# Run nginx as non-root user.
+RUN chown -R nginx:nginx /etc/nginx && chown -R nginx:nginx /var/cache/nginx
+USER nginx
