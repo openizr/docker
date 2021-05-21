@@ -75,6 +75,10 @@ server {
 
   # Static assets server.
   location / {
+    # CORS headers.
+    add_header 'Access-Control-Max-Age' 300 always;
+    add_header 'Access-Control-Allow-Origin' '$origin' always;
+
     try_files $uri @frontend;
     root /var/www/html/public;
     expires 7d;

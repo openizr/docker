@@ -5,6 +5,7 @@ ENV BOT_USER_AGENTS=_
 ENV FRONTEND_HOST=localhost
 ENV BACKEND_URI=http://localhost:9000
 ENV PRERENDERER_URI=http://localhost:9001
+ENV CORS_ALLOWED_ORIGINS=(.*)
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
