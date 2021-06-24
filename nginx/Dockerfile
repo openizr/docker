@@ -1,4 +1,4 @@
-FROM nginx:1.19-alpine
+FROM nginx:1.21-alpine
 
 ENV CSP="default-src 'self' https: data: 'unsafe-inline'; base-uri 'self'; block-all-mixed-content; frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests"
 ENV BOT_USER_AGENTS=_
