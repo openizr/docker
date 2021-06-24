@@ -1,14 +1,17 @@
 /**
- * Copyright (c) ...
- * All rights reserved.
+ * Copyright (c) Matthieu Jabbour. All Rights Reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
  */
 
 import { FastifyInstance } from 'fastify';
-import v1GetPrerendered from 'scripts/routes/v1/getPrerendered';
+import prerender from 'scripts/routes/prerender';
 
 /**
  * App endpoints declaration.
  */
 export default (server: FastifyInstance): void => {
-  server.get('*', v1GetPrerendered);
+  server.get('*', prerender);
 };

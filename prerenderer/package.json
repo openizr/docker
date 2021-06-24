@@ -1,26 +1,11 @@
 {
-  "name": "prerenderer",
-  "version": "1.0.0",
-  "description": "Pre-renders dynamically-generated pages for SEO purposes",
-  "repository": "https://github.com/openizr/docker",
-  "bugs": "https://github.com/openizr/docker/issues",
-  "main": "./main.js",
-  "keywords": [
-    "seo",
-    "pre-rendering",
-    "html"
-  ],
-  "contributors": [
-    {
-      "name": "Matthieu Jabbour",
-      "email": "matthieu.jabbour@gmail.com",
-      "homepage": "https://github.com/matthieujabbour"
-    }
-  ],
   "license": "MIT",
+  "main": "./main.js",
   "devDependencies": {
+    "@types/fs-extra": "^9.0.6",
+    "@types/multiparty": "^0.0.32",
     "@types/puppeteer": "^5.4.2",
-    "typescript-dev-kit": "^2.3.3"
+    "typescript-dev-kit": "^3.1.0"
   },
   "eslintConfig": {
     "extends": [
@@ -28,11 +13,13 @@
     ]
   },
   "dependencies": {
-    "@types/ajv-errors": "^1.0.3",
-    "ajv-errors": "^1.0.1",
-    "basx": "^1.0.0",
-    "fastify": "^3.9.2",
-    "puppeteer": "5.2.1"
+    "ajv": "^8.2.0",
+    "ajv-errors": "^3.0.0",
+    "fastify": "^3.15.1",
+    "fs-extra": "^10.0.0",
+    "multiparty": "^4.2.2",
+    "puppeteer": "10.0.0",
+    "source-map-support": "^0.5.19"
   },
   "tsDevKitConfig": {
     "target": "node",
@@ -42,7 +29,7 @@
     "runInDev": true,
     "srcPath": "src",
     "distPath": "dist",
-    "banner": "/*!\n * Copyright (c) ...\n * All rights reserved.\n */",
+    "banner": "/*!\n * Copyright (c) Matthieu Jabbour. All Rights Reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE file in the root directory of this source tree.\n */",
     "env": {
       "development": {},
       "production": {}
@@ -53,6 +40,7 @@
     "dev": "cd node_modules/typescript-dev-kit/ && node scripts/dev",
     "build": "cd node_modules/typescript-dev-kit/ && node scripts/build",
     "test": "cd node_modules/typescript-dev-kit/ && node scripts/test",
-    "doc": "node_modules/.bin/typedoc --out ./doc/ src/ --exclude \"**/__+(tests|mocks)__/**\""
+    "doc": "node_modules/.bin/typedoc --out ./doc/ --exclude \"**/*.js\" --exclude \"**/__+(tests|mocks)__/**\" src/",
+    "postinstall": "rm -f node_modules/.eslintcache"
   }
 }
