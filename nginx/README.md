@@ -1,7 +1,7 @@
 # nginx
 
 This Docker image is a pre-configured nginx server ready to serve static or dynamic pages, APIs, and static assets.
-*Optimized for production. If you whish to benefit of development featues, please refer to the development image.*
+*Optimized for production. If you whish to benefit of development features, please refer to the development image.*
 
 ## Environment variables
 
