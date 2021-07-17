@@ -7,6 +7,7 @@ from private git repositories, using SSH keys.
 ## Useful commands
 
 - `dsync path/to/source/directory path/to/dest/directory`: keep 2 directories synchronized in real-time using `rsync`
+- `register_ssh`: registers SSH keys from environment variables (automatically performed on start-up)
 
 
 ## Environment variables
