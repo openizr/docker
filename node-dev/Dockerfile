@@ -4,6 +4,7 @@ ENV NODE_ENV=development
 
 COPY ./docker-entrypoint.sh /usr/local/bin/
 COPY ./dsync /usr/local/bin/
+COPY ./register_ssh /usr/local/bin/
 RUN apk add --no-cache openssh-client git inotify-tools rsync
 RUN mkdir -p /root/.ssh
 
