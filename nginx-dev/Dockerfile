@@ -10,6 +10,7 @@ ENV CORS_ALLOWED_METHODS=GET,POST,PUT,PATCH,DELETE,OPTIONS
 ENV CORS_ALLOWED_HEADERS=Auhtorization,Accept,Content-Type
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./extra.conf /etc/nginx/conf.d/extra.conf
 COPY ./docker-entrypoint.sh /docker-entrypoint.sh
 COPY ./80.conf.template /etc/nginx/templates/80.conf.template
 COPY ./80.static.conf.template /etc/nginx/templates/80.static.conf.template

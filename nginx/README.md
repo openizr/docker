@@ -1,7 +1,14 @@
 # nginx
 
 This Docker image is a pre-configured nginx server ready to serve static or dynamic pages, APIs, and static assets.
-*Optimized for production. If you whish to benefit of development features, please refer to the development image.*
+*Optimized for production. If you wish to benefit of development features, please refer to the development image.*
+
+
+## Additional nginx configuration
+
+If needed, you can add or override nginx directives, by using the `/etc/nginx/conf.d/extra.conf` file (empty by default).
+This file is automatically imported by nginx at startup.
+
 
 ## Environment variables
 

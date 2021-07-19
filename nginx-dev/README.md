@@ -3,6 +3,13 @@
 This Docker image is a pre-configured nginx server ready to serve static or dynamic pages, APIs, and static assets.
 *Use it only in a development environment, do not deploy it in production.*
 
+
+## Additional nginx configuration
+
+If needed, you can add or override nginx directives, by using the `/etc/nginx/conf.d/extra.conf` file (empty by default).
+This file is automatically imported by nginx at startup.
+
+
 ## Environment variables
 
 - *`CSP`*: Content Security Policy. Default is `default-src 'self' https: data: 'unsafe-inline'; base-uri 'self'; block-all-mixed-content; frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests`
