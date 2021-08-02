@@ -10,7 +10,6 @@ server {
   server_name _;
   server_tokens off;
 
-
   # Back-end server.
   location /api  {
     # All headers must be duplicated.
@@ -64,18 +63,45 @@ server {
     proxy_http_version 1.1;
     proxy_set_header Host ${FRONTEND_HOST}:${FRONTEND_PORT};
 
+    # Security headers.
+    add_header 'Expect-CT' 'max-age=0' always;
+    add_header 'X-Frame-Options' 'SAMEORIGIN' always;
+    add_header 'X-DNS-Prefetch-Control' 'off' always;
+    add_header 'Referrer-Policy' 'no-referrer' always;
+    add_header 'X-Content-Type-Options' 'nosniff' always;
+    add_header 'Content-Security-Policy' "${CSP}" always;
+    add_header 'X-Permitted-Cross-Domain-Policies' 'none' always;
+    add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
+
+    # CORS headers.
+    add_header 'Access-Control-Max-Age' 300 always;
+    add_header 'Access-Control-Allow-Origin' '$origin' always;
+    add_header 'Access-Control-Allow-Methods' "${CORS_ALLOWED_METHODS}" always;
+    add_header 'Access-Control-Allow-Headers' "${CORS_ALLOWED_HEADERS}" always;
+
     # Pre-renders only for search engines crawlers.
     if ($http_user_agent ~* "${BOT_USER_AGENTS}") {
       proxy_pass ${PRERENDERER_URI};
       break;
     }
 
-    root /var/www/html/public;
     try_files /index.html =404;
+    root /var/www/html/public;
+    expires 7d;
   }
 
   # Static assets server.
   location / {
+    # Security headers.
+    add_header 'Expect-CT' 'max-age=0' always;
+    add_header 'X-Frame-Options' 'SAMEORIGIN' always;
+    add_header 'X-DNS-Prefetch-Control' 'off' always;
+    add_header 'Referrer-Policy' 'no-referrer' always;
+    add_header 'X-Content-Type-Options' 'nosniff' always;
+    add_header 'Content-Security-Policy' "${CSP}" always;
+    add_header 'X-Permitted-Cross-Domain-Policies' 'none' always;
+    add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
+
     # CORS headers.
     add_header 'Access-Control-Max-Age' 300 always;
     add_header 'Access-Control-Allow-Origin' '$origin' always;
