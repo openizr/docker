@@ -1,0 +1,42 @@
+version: "3.6"
+
+services:
+  prerenderer:
+    container_name: ${PROJECT_NAME}_prerenderer
+    image: openizr/prerenderer:3.0.0
+    # environment:
+    #   - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+    #   - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    env_file:
+      - .env
+    # command: sh -c "apk add --no-cache chromium nss harfbuzz ca-certificates ttf-freefont && yarn && yarn run dev"
+    # volumes:
+    #   - ./prerenderer:/var/www/html
+    restart: unless-stopped
+  nginx:
+    container_name: ${PROJECT_NAME}_nginx
+    image: openizr/nginx:3.1.2-dev
+    env_file:
+      - .env
+    ports:
+      - "${HOST_IP}:${NGINX_PORT}:${NGINX_PORT}"
+    volumes:
+      - ./frontend:/var/www/html
+    restart: unless-stopped
+  frontend:
+    container_name: ${PROJECT_NAME}_frontend
+    image: openizr/node:3.0.0-dev
+    env_file:
+      - .env
+    command: sh -c "yarn && yarn run build && tail -f /dev/null"
+    volumes:
+      - ./frontend:/var/www/html
+    restart: unless-stopped
+
+# For people that use a VPN
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.61.0/24

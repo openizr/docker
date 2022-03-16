@@ -1,0 +1,65 @@
+{
+  "name": "APP_NAME-frontend",
+  "version": "VERSION",
+  "description": "APP_DESCRIPTION",
+  "repository": "GIT REPOSITORY",
+  "bugs": "GIT BUGS PAGE",
+  "main": "./main.js",
+  "keywords": [],
+  "contributors": [
+    {
+      "name": "AUTHOR_NAME",
+      "email": "AUTHOR_EMAIL",
+      "homepage": "https://github.com/AUTHOR_USERNAME"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@testing-library/dom": "^8.11.3",
+    "@testing-library/svelte": "^3.0.3",
+    "aria-query": "^5.0.0",
+    "typescript-dev-kit": "^5.0.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "./node_modules/typescript-dev-kit/main.js"
+    ]
+  },
+  "dependencies": {
+    "basx": "^2.0.1",
+    "diox": "^5.0.2",
+    "svelte": "^3.46.4"
+  },
+  "tsDevKitConfig": {
+    "target": "web",
+    "devServer": {
+      "host": "0.0.0.0",
+      "port": 5000
+    },
+    "html": "./html/index.html",
+    "srcPath": "src",
+    "distPath": "public",
+    "banner": "/*!\n * Copyright (c) ...\n * All rights reserved.\n */",
+    "env": {
+      "development": {
+        "ENV": "development",
+        "NODE_ENV": "development",
+        "API_URL": "http://localhost:9000/api"
+      },
+      "production": {
+        "ENV": "production",
+        "NODE_ENV": "production",
+        "API_URL": "/api"
+      }
+    }
+  },
+  "scripts": {
+    "init": "node_modules/typescript-dev-kit/scripts/init.sh",
+    "dev": "cd node_modules/typescript-dev-kit/ && node scripts/dev",
+    "check": "cd node_modules/typescript-dev-kit/ && node scripts/check",
+    "build": "cd node_modules/typescript-dev-kit/ && node scripts/build",
+    "test": "cd node_modules/typescript-dev-kit/ && node --experimental-vm-modules scripts/test",
+    "doc": "typedoc --out ./doc/ --exclude \"**/__+(tests|mocks)__/**\" src/scripts/main.ts",
+    "postinstall": "rm -f node_modules/.eslintcache"
+  }
+}
