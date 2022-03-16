@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`routes/prerender correctly handles request - 200 1`] = `
+Object {
+  "response": Object {
+    "200": Object {
+      "type": "string",
+    },
+  },
+}
+`;
+
+exports[`routes/prerender correctly handles request - 301 1`] = `
+Object {
+  "response": Object {
+    "200": Object {
+      "type": "string",
+    },
+  },
+}
+`;
