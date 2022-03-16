@@ -1,6 +1,6 @@
 FROM nginx:1.21.1-alpine
 
-ENV CSP="default-src 'self' https: data: 'unsafe-inline'; base-uri 'self'; block-all-mixed-content; frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests"
+ENV CSP="default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
 ENV BOT_USER_AGENTS=___
 ENV FRONTEND_HOST=localhost
 ENV BACKEND_URI=http://localhost:9000

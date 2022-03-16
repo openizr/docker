@@ -12,7 +12,7 @@ This file is automatically imported by nginx at startup.
 
 ## Environment variables
 
-- *`CSP`*: Content Security Policy. Default is `default-src 'self' https: data: 'unsafe-inline'; base-uri 'self'; block-all-mixed-content; frame-ancestors 'self'; object-src 'none'; upgrade-insecure-requests`
+- *`CSP`*: Content Security Policy. Default is `default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';`
 - *`BOT_USER_AGENTS`*: regular expression defining which user agent is considered as a robot and should trigger pre-rendering (used only when serving dynamic pages). Default is `_`
 - *`FRONTEND_PORT`*: front-end port listening for incoming HTTP requests
 - *`FRONTEND_HOST`*: front-end host listening for incoming HTTP requests. Default is `localhost`
