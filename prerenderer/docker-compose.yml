@@ -3,15 +3,15 @@ version: "3.6"
 services:
   prerenderer:
     container_name: ${PROJECT_NAME}_prerenderer
-    image: openizr/prerenderer:3.0.0
-    # environment:
-    #   - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-    #   - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    image: openizr/node:3.0.0-dev
+    environment:
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
     env_file:
       - .env
-    # command: sh -c "apk add --no-cache chromium nss harfbuzz ca-certificates ttf-freefont && yarn && yarn run dev"
-    # volumes:
-    #   - ./prerenderer:/var/www/html
+    command: sh -c "apk add --no-cache chromium nss harfbuzz ca-certificates ttf-freefont && yarn && yarn run dev"
+    volumes:
+      - ./prerenderer:/var/www/html
     restart: unless-stopped
   nginx:
     container_name: ${PROJECT_NAME}_nginx
