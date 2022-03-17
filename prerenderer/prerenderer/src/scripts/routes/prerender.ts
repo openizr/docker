@@ -6,36 +6,50 @@
  *
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer';
 import configuration from 'scripts/conf/app';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import createSchema from 'scripts/helpers/createSchema';
 
+type Callback = (result: Result) => void;
+type Item = { url: string; callback: Callback; };
+type Result = { status: number; content: string; redirect?: string; };
+
+const queue: Item[] = [];
+const pages: Page[] = [];
 let host = 'localhost:5000';
 const args = ['--no-sandbox', '--headless', '--disable-gpu', '--disable-dev-shm-usage'];
-
+const pageStatuses = (new Array(10)).fill(true);
 const launchPromise = puppeteer.launch({ headless: true, args }).then(async (browser) => {
-  const page = await browser.newPage();
-  await page.setRequestInterception(true);
-  page.on('request', (puppeteerRequest) => {
-    // Optimizing loading speed by skipping unecessary assets...
-    if (/image|font|stylesheet/i.test(puppeteerRequest.resourceType())) {
-      puppeteerRequest.respond({ body: '' });
-    } else {
-      puppeteerRequest.continue();
-    }
-  });
-  return page;
+  await Promise.all(pageStatuses.map(async () => {
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (puppeteerRequest) => {
+      // Optimizing loading speed by skipping unecessary assets...
+      if (/image|font|stylesheet/i.test(puppeteerRequest.resourceType())) {
+        puppeteerRequest.respond({ body: '' });
+      } else {
+        puppeteerRequest.continue();
+      }
+    });
+    pages.push(page);
+  }));
 });
 
 /**
- * `GET *` endpoint handler.
+ * Processes next item in the queue, if any.
+ *
+ * @returns {Promise<void>}
  */
-export default {
-  handler: async (request: FastifyRequest, response: FastifyReply): Promise<void> => {
-    host = request.headers.host || host;
-    const page = await launchPromise;
-    await page.goto(`http://${host}${request.url}`);
+async function processQueue(): Promise<void> {
+  const firstAvailablePage = pageStatuses.indexOf(true);
+  // Item processing can only happen if a puppeteer page is available for prerendering.
+  if (queue.length > 0 && firstAvailablePage >= 0) {
+    pageStatuses[firstAvailablePage] = false;
+    const nextItem = <Item>queue.shift();
+    await launchPromise;
+    const page = pages[firstAvailablePage];
+    await page.goto(nextItem.url);
     const frame = await page.waitForSelector('#prerender', { timeout: configuration.connectionTimeout - 100 });
     const props: Record<string, string> = await page.evaluate(
       (element) => {
@@ -46,12 +60,46 @@ export default {
       },
       frame,
     );
+    const redirect = props['data-redirect'];
     const status = parseInt(props['data-status'], 10) || 200;
     const content = (await page.content()).replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/<link\b[^<]*rel="modulepreload"[^<]*>/gi, '');
-    if (status === 301 && props['data-redirect']) {
-      response.header('Location', props['data-redirect']);
+    nextItem.callback({
+      status,
+      content,
+      redirect,
+    });
+    pageStatuses[firstAvailablePage] = true;
+    processQueue();
+  }
+}
+
+/**
+ * Pushes `url` into the prerendering queue.
+ *
+ * @param {string} url URL to prerender.
+ *
+ * @param {Callback} callback Callback to call as soon as prerendering is done.
+ *
+ * @returns {void}
+ */
+function pushToQueue(url: string, callback: Callback): void {
+  queue.push({ url, callback });
+  processQueue();
+}
+
+/**
+ * `GET *` endpoint handler.
+ */
+export default {
+  handler: async (request: FastifyRequest, response: FastifyReply): Promise<void> => {
+    host = request.headers.host || host;
+    const result = await new Promise<Result>((resolve) => {
+      pushToQueue(`http://${host}${request.url}`, resolve);
+    });
+    if (result.status === 301 && result.redirect) {
+      response.header('Location', result.redirect);
     }
-    response.status(status).header('Content-Type', 'text/html').send(content);
+    response.status(result.status).header('Content-Type', 'text/html').send(result.content);
   },
   schema: createSchema({
     response: {

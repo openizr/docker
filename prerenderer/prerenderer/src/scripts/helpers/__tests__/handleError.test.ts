@@ -23,8 +23,10 @@ import { FastifyRequest, FastifyReply, FastifyError } from 'fastify';
 
 describe('helpers/handleError', () => {
   const send = jest.fn();
+  const logger = console;
   const logError = jest.fn();
   const status = jest.fn(() => ({ send }));
+  Object.assign(console, { error: jest.fn() });
   const response = <FastifyReply>({ status } as unknown);
   const request = <FastifyRequest>({ log: { error: logError }, headers: {} } as unknown);
 
@@ -114,6 +116,20 @@ describe('helpers/handleError', () => {
     await handleError(error, request, response);
     expect(send).toHaveBeenCalledWith({ error: { code: 'invalid_payload', message: 'Body must be a valid JSON.' } });
     expect(status).toHaveBeenCalledWith(400);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith({
+      distinctId: 'prerenderer',
+      event: 'Error',
+      properties: {
+        code: 'invalid_payload',
+        environment: 'production',
+        from: 'prerenderer',
+        headers: [],
+        level: 'info',
+        message: 'Body must be a valid JSON.',
+        statusCode: 400,
+      },
+    });
   });
 
   test('HTTP 500', async () => {
@@ -122,5 +138,19 @@ describe('helpers/handleError', () => {
     expect(send).toHaveBeenCalledWith({ error: { code: 'internal_server_error', message: 'Internal Server Error.' } });
     expect(status).toHaveBeenCalledWith(500);
     expect(request.log.error).toHaveBeenCalledWith(error);
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith({
+      distinctId: 'prerenderer',
+      event: 'Error',
+      properties: {
+        environment: 'production',
+        from: 'prerenderer',
+        headers: [],
+        level: 'error',
+        message: '',
+        statusCode: 500,
+        stack: expect.any(String),
+      },
+    });
   });
 });
