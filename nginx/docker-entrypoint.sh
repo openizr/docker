@@ -19,6 +19,17 @@ else
   fi
 fi
 
+# Pre-compressing static assets (see https://expeditedsecurity.com/blog/nginx-brotli/)...
+old_ifs=$ifs
+ifs=$'\n'
+for file in $(find /var/www/html/public -type f -iname '*.css' -o -iname '*.js' -o -iname '*.svg' -o -iname '*.json' -o -iname '*.txt' -o -iname '*.html' -o -iname '*.xml' -o -iname '*.ttf' -o -iname '*.otf'); do
+    echo -n "Compressing ${file}..."
+    gzip --force -9 -k ${file};
+    brotli ${file} --force -o ${file}.br;
+    echo "done."
+done
+ifs=$old_ifs
+
 if [ "$1" = "nginx" -o "$1" = "nginx-debug" ]; then
     if /usr/bin/find "/docker-entrypoint.d/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
         echo >&3 "$0: /docker-entrypoint.d/ is not empty, will attempt to perform configuration"
