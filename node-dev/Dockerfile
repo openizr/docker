@@ -7,7 +7,7 @@ COPY ./dsync /usr/local/bin/
 COPY ./register_ssh /usr/local/bin/
 RUN apk add --no-cache openssh-client git inotify-tools rsync
 RUN mkdir -p /root/.ssh
-RUN mkdir -p /node/.ssh
+RUN mkdir -p /home/node/.ssh
 
 # See https://github.com/Yelp/dumb-init.
 RUN dumb_init_url=https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
