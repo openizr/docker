@@ -19,6 +19,6 @@ This file is automatically imported by nginx at startup.
 - *`BACKEND_URI`*: back-end host and port to which forward incoming HTTP requests (other than static assets). Default is `http://localhost:9000`
 - *`PRERENDERER_URI`*: prerendering service host to which forward robots HTTP requests (used only when serving dynamic pages). Default is `http://localhost:9001`
 - *`CORS_ALLOWED_ORIGINS`*: regular expression containing allowed origins for CORS. Default is `(.*)`
-- *`CORS_ALLOWED_HEADERS`*: list of allowed HTTP headers for CORS. Default is `Auhtorization,Accept,Content-Type`
+- *`CORS_ALLOWED_HEADERS`*: list of allowed HTTP headers for CORS. Default is `Authorization,Accept,Content-Type`
 - *`CORS_ALLOWED_METHODS`*: list of allowed HTTP methods for CORS. Default is `GET,POST,PUT,PATCH,DELETE,OPTIONS`
 - *`NGINX_ENTRYPOINT_STATIC_SERVER`*: whether to configure this server to serve static pages (leave empty to serve dynamic pages by default)

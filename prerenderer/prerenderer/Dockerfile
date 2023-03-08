@@ -24,4 +24,4 @@ RUN apk add --no-cache \
 USER node
 COPY --from=build-stage /var/www/html/dist/ /var/www/html/
 RUN yarn
-CMD node main.js
+CMD ["node", "main.js"]

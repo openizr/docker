@@ -1,11 +1,11 @@
-FROM nginx:1.23.1-alpine as brotli
+FROM nginx:1.23.3-alpine as brotli
 RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-libs
 RUN git clone https://github.com/google/ngx_brotli.git
 WORKDIR /ngx_brotli
 RUN git submodule update --init
 WORKDIR /
-RUN wget https://nginx.org/download/nginx-1.23.1.tar.gz && tar zxvf nginx-1.23.1.tar.gz
-WORKDIR /nginx-1.23.1
+RUN wget https://nginx.org/download/nginx-1.23.3.tar.gz && tar zxvf nginx-1.23.3.tar.gz
+WORKDIR /nginx-1.23.3
 RUN ./configure \
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -51,7 +51,7 @@ RUN ./configure \
   --add-dynamic-module=../ngx_brotli
 RUN make && make install
 
-FROM nginx:1.23.1-alpine
+FROM nginx:1.23.3-alpine
 
 ENV CSP="default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
 ENV BOT_USER_AGENTS=___
@@ -60,7 +60,7 @@ ENV BACKEND_URI=http://localhost:9000
 ENV PRERENDERER_URI=http://localhost:9001
 ENV CORS_ALLOWED_ORIGINS=(.*)
 ENV CORS_ALLOWED_METHODS=GET,POST,PUT,PATCH,DELETE,OPTIONS
-ENV CORS_ALLOWED_HEADERS=Auhtorization,Accept,Content-Type
+ENV CORS_ALLOWED_HEADERS=Authorization,Accept,Content-Type
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./extra.conf /etc/nginx/conf.d/extra.conf
