@@ -1,11 +1,10 @@
-FROM nginx:1.23.3-alpine as brotli
-RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-libs
-RUN git clone https://github.com/google/ngx_brotli.git
-WORKDIR /ngx_brotli
-RUN git submodule update --init
-WORKDIR /
-RUN wget https://nginx.org/download/nginx-1.23.3.tar.gz && tar zxvf nginx-1.23.3.tar.gz
-WORKDIR /nginx-1.23.3
+FROM nginx:1.25.3-alpine as brotli
+RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-libs libaio linux-headers
+RUN git clone --recurse-submodules -j8 https://github.com/google/ngx_brotli
+RUN wget https://nginx.org/download/nginx-1.25.3.tar.gz && tar zxvf nginx-1.25.3.tar.gz
+WORKDIR /nginx-1.25.3
+RUN ln -s /usr/lib/libbrotlienc.so.1.0.9 /usr/lib/libbrotlienc.so \
+  && ln -s /usr/lib/libbrotlicommon.so.1.0.9 /usr/lib/libbrotlicommon.so
 RUN ./configure \
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -22,7 +21,9 @@ RUN ./configure \
   --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
   --with-perl_modules_path=/usr/lib/perl5/vendor_perl \
   --user=nginx \
-  --group=nginx--with-file-aio \
+  --group=nginx \
+  --with-compat \
+  --with-file-aio \
   --with-threads \
   --with-http_addition_module \
   --with-http_auth_request_module \
@@ -39,20 +40,19 @@ RUN ./configure \
   --with-http_stub_status_module \
   --with-http_sub_module \
   --with-http_v2_module \
+  --with-http_v3_module \
   --with-mail \
   --with-mail_ssl_module \
   --with-stream \
   --with-stream_realip_module \
   --with-stream_ssl_module \
   --with-stream_ssl_preread_module \
-  --with-cc-opt='-Os -fomit-frame-pointer -g' \
-  --with-ld-opt=-Wl,--as-needed,-O1,--sort-common \
-  --with-compat \
+  --with-cc-opt='-Os -Wformat -Werror=format-security -g' \
+  --with-ld-opt='-Wl,--as-needed,-O1,--sort-common -Wl,-z,pack-relative-relocs' \
   --add-dynamic-module=../ngx_brotli
 RUN make && make install
 
-FROM nginx:1.23.3-alpine
-
+FROM nginx:1.25.3-alpine
 ENV CSP="default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
 ENV BOT_USER_AGENTS=___
 ENV FRONTEND_HOST=localhost
