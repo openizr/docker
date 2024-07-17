@@ -1,3 +1,15 @@
+## node:7.0.0-dev (2024-07-17)
+
+### Breaking changes
+- Upgrade `node` version to `22.4.1`
+
+
+## node:7.0.0 (2024-07-17)
+
+### Breaking changes
+- Upgrade `node` version to `22.4.1`
+
+
 ## nginx:4.0.3 (2024-07-17)
 
 ### Improvements
@@ -97,13 +109,13 @@
 ## node:4.0.0-dev (2022-09-03)
 
 ### Breaking changes
-- Upgrade `node` version to 18.8
+- Upgrade `node` version to `18.8`
 
 
 ## node:4.0.0 (2022-09-03)
 
 ### Breaking changes
-- Upgrade `node` version to 18.8
+- Upgrade `node` version to `18.8`
 
 
 ## prerenderer:3.0.1 (2022-03-17)
@@ -140,13 +152,13 @@
 ## node:3.0.0-dev (2022-02-24)
 
 ### Breaking changes
-- Upgrade node version to 17.6
+- Upgrade node version to `17.6`
 
 
 ## node:3.0.0 (2022-02-24)
 
 ### Breaking changes
-- Upgrade node version to 17.6
+- Upgrade node version to `17.6`
 
 
 ## nginx:3.1.1-dev (2021-08-02)
@@ -268,7 +280,7 @@
 ## node:2.0.0-dev (2021-04-13)
 
 ### Breaking changes
-- Upgrade `node` major version to 15
+- Upgrade `node` major version to `15`
 
 ### Improvements
 - `dsync` utility now performs a first synchronization when started, and can also synchronize two files
@@ -277,7 +289,7 @@
 ## node:2.0.0 (2021-04-13)
 
 ### Breaking changes
-- Upgrade `node` major version to 15
+- Upgrade `node` major version to `15`
 
 
 ## node:1.1.0-dev (2021-03-20)
