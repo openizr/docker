@@ -1,10 +1,8 @@
-FROM nginx:1.25.3-alpine as brotli
-RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-libs libaio linux-headers
+FROM nginx:1.27.0-alpine AS brotli
+RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-dev libaio linux-headers
 RUN git clone --recurse-submodules -j8 https://github.com/google/ngx_brotli
-RUN wget https://nginx.org/download/nginx-1.25.3.tar.gz && tar zxvf nginx-1.25.3.tar.gz
-WORKDIR /nginx-1.25.3
-RUN ln -s /usr/lib/libbrotlienc.so.1.0.9 /usr/lib/libbrotlienc.so \
-  && ln -s /usr/lib/libbrotlicommon.so.1.0.9 /usr/lib/libbrotlicommon.so
+RUN wget https://nginx.org/download/nginx-1.27.0.tar.gz && tar zxvf nginx-1.27.0.tar.gz
+WORKDIR /nginx-1.27.0
 RUN ./configure \
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -52,7 +50,7 @@ RUN ./configure \
   --add-dynamic-module=../ngx_brotli
 RUN make && make install
 
-FROM nginx:1.25.3-alpine
+FROM nginx:1.27.0-alpine
 ENV CSP="default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
 ENV BOT_USER_AGENTS=___
 ENV FRONTEND_HOST=localhost
