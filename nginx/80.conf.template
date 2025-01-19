@@ -28,7 +28,7 @@ server {
 
       # CORS headers.
       add_header 'Content-Length' 0 always;
-      add_header 'Access-Control-Max-Age' 300 always;
+      add_header 'Access-Control-Max-Age' 86400 always;
       add_header 'Access-Control-Allow-Origin' '$origin' always;
       add_header 'Content-Type' 'text/plain charset=UTF-8' always;
       add_header 'Access-Control-Allow-Credentials' 'true' always;
@@ -48,7 +48,7 @@ server {
     add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
 
     # CORS headers.
-    add_header 'Access-Control-Max-Age' 300 always;
+    add_header 'Access-Control-Max-Age' 86400 always;
     add_header 'Access-Control-Allow-Origin' '$origin' always;
     add_header 'Access-Control-Allow-Credentials' 'true' always;
     add_header 'Access-Control-Allow-Methods' "${CORS_ALLOWED_METHODS}" always;
@@ -74,7 +74,7 @@ server {
     add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
 
     # CORS headers.
-    add_header 'Access-Control-Max-Age' 300 always;
+    add_header 'Access-Control-Max-Age' 86400 always;
     add_header 'Access-Control-Allow-Origin' '$origin' always;
     add_header 'Access-Control-Allow-Methods' "${CORS_ALLOWED_METHODS}" always;
     add_header 'Access-Control-Allow-Headers' "${CORS_ALLOWED_HEADERS}" always;
@@ -103,14 +103,14 @@ server {
     add_header 'Strict-Transport-Security' 'max-age=123456; includeSubDomains' always;
 
     # CORS headers.
-    add_header 'Access-Control-Max-Age' 300 always;
+    add_header 'Access-Control-Max-Age' 86400 always;
     add_header 'Access-Control-Allow-Origin' '$origin' always;
     add_header 'Access-Control-Allow-Methods' "${CORS_ALLOWED_METHODS}" always;
     add_header 'Access-Control-Allow-Headers' "${CORS_ALLOWED_HEADERS}" always;
 
     try_files $uri @frontend;
     root /var/www/html/public;
-    expires 7d;
+    expires 97d;
   }
 
   # Prevents showing sourcemaps in production.

@@ -1,8 +1,8 @@
-FROM nginx:1.27.0-alpine AS brotli
+FROM nginx:1.27.3-alpine AS brotli
 RUN apk add --no-cache make git gcc g++ pcre-dev zlib-dev openssl-dev brotli brotli-dev libaio linux-headers
 RUN git clone --recurse-submodules -j8 https://github.com/google/ngx_brotli
-RUN wget https://nginx.org/download/nginx-1.27.0.tar.gz && tar zxvf nginx-1.27.0.tar.gz
-WORKDIR /nginx-1.27.0
+RUN wget https://nginx.org/download/nginx-1.27.3.tar.gz && tar zxvf nginx-1.27.3.tar.gz
+WORKDIR /nginx-1.27.3
 RUN ./configure \
   --prefix=/etc/nginx \
   --sbin-path=/usr/sbin/nginx \
@@ -45,12 +45,12 @@ RUN ./configure \
   --with-stream_realip_module \
   --with-stream_ssl_module \
   --with-stream_ssl_preread_module \
-  --with-cc-opt='-Os -Wformat -Werror=format-security -g' \
-  --with-ld-opt='-Wl,--as-needed,-O1,--sort-common -Wl,-z,pack-relative-relocs' \
+  --with-cc-opt='-Os -fstack-clash-protection -Wformat -Werror=format-security -g' \
+  --with-ld-opt='-Wl,--as-needed,-O1,--sort-common' \
   --add-dynamic-module=../ngx_brotli
 RUN make && make install
 
-FROM nginx:1.27.0-alpine
+FROM nginx:1.27.3-alpine
 ENV CSP="default-src 'self' https: data:; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
 ENV BOT_USER_AGENTS=___
 ENV FRONTEND_HOST=localhost
