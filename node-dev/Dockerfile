@@ -1,4 +1,6 @@
-FROM node:22.4.1-alpine3.19
+FROM node:23.6.0-alpine3.21
+
+ARG TARGETARCH
 
 ENV NODE_ENV=development
 
@@ -10,7 +12,8 @@ COPY ./dsync /usr/local/bin/
 COPY ./register_ssh /usr/local/bin/
 
 # See https://github.com/Yelp/dumb-init.
-RUN dumb_init_url=https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
+RUN extension=$([ $TARGETARCH = "arm64" ] && echo "aarch64" || echo "x86_64") && \
+  dumb_init_url="https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_$extension" && \
   wget -O /usr/local/bin/dumb-init $dumb_init_url \
   && chmod +x /usr/local/bin/dumb-init
 ENTRYPOINT ["/usr/local/bin/dumb-init", "docker-entrypoint.sh"]

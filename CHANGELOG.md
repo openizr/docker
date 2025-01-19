@@ -1,3 +1,43 @@
+## nginx:4.1.0 (2025-01-19)
+
+### Features
+- Add native support for ARM64 architectures
+
+### Improvements
+- Upgrade `nginx` version to `1.27.3`
+- Increase static assets caching TTL to 97 days by default
+- Increase CORS preflight requests caching TTL to 86400 seconds by default
+
+
+## nginx:4.1.0-dev (2025-01-19)
+
+### Features
+- Add native support for ARM64 architectures
+
+### Improvements
+- Upgrade `nginx` version to `1.27.3`
+- Increase static assets caching TTL to 97 days by default
+- Increase CORS preflight requests caching TTL to 86400 seconds by default
+
+
+## node:8.0.0 (2025-01-19)
+
+### Breaking changes
+- Upgrade `node` version to `23.6.0`
+
+### Features
+- Add native support for ARM64 architectures
+
+
+## node:8.0.0-dev (2025-01-19)
+
+### Breaking changes
+- Upgrade `node` version to `23.6.0`
+
+### Features
+- Add native support for ARM64 architectures
+
+
 ## node:7.0.0-dev (2024-07-17)
 
 ### Breaking changes
