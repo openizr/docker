@@ -10,7 +10,7 @@ if [ ! -z "${SSH_PRIVATE_KEY:-}" ] && [ ! -z "${SSH_PUBLIC_KEY:-}" ]; then
   echo -e $SSH_PUBLIC_KEY > $HOME/.ssh/id_rsa.pub
   chmod 644 $HOME/.ssh/id_rsa.pub
   ssh-keyscan -H 'github.com' > $HOME/.ssh/known_hosts 2> /dev/null
-  ssh-keyscan -H 'gitlab.com' > $HOME/.ssh/known_hosts 2> /dev/null
+  ssh-keyscan -H 'gitlab.com' >> $HOME/.ssh/known_hosts 2> /dev/null
   chmod 644 $HOME/.ssh/known_hosts
   chmod 700 $HOME/.ssh
   echo "Successfully registered SSH keys"

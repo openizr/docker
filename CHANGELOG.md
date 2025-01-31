@@ -1,3 +1,9 @@
+## node:8.0.1-dev (2025-01-31)
+
+### Bugs
+- Fix `github.com` SSH host registration in `register_ssh` script
+
+
 ## nginx:4.1.0 (2025-01-19)
 
 ### Features
