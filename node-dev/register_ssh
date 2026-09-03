@@ -2,16 +2,28 @@
 
 # Strict error handling.
 set -eu
-set -o pipefail
 
-if [ ! -z "${SSH_PRIVATE_KEY:-}" ] && [ ! -z "${SSH_PUBLIC_KEY:-}" ]; then
-  echo -e $SSH_PRIVATE_KEY > $HOME/.ssh/id_rsa
-  chmod 600 $HOME/.ssh/id_rsa
-  echo -e $SSH_PUBLIC_KEY > $HOME/.ssh/id_rsa.pub
-  chmod 644 $HOME/.ssh/id_rsa.pub
-  ssh-keyscan -H 'github.com' > $HOME/.ssh/known_hosts 2> /dev/null
-  ssh-keyscan -H 'gitlab.com' >> $HOME/.ssh/known_hosts 2> /dev/null
-  chmod 644 $HOME/.ssh/known_hosts
-  chmod 700 $HOME/.ssh
-  echo "Successfully registered SSH keys"
+# Key comes from stdin: an argument would leak into `ps`, shell history and `docker inspect`.
+if [ "$#" -ne 0 ] || [ -t 0 ]; then
+  echo "Usage: register_ssh < path/to/private_key" >&2
+  exit 1
 fi
+
+KEY_CONTENT="$(cat)"
+if [ -z "$KEY_CONTENT" ]; then
+  echo "register_ssh: empty key" >&2
+  exit 1
+fi
+
+# `id_rsa` is kept as the file name because ssh looks it up by default and
+# reads the actual key type from the content.
+KEY="$HOME/.ssh/id_rsa"
+
+# Files are created private from the start, no window before a `chmod`.
+umask 077
+mkdir -p "$HOME/.ssh"
+# `>` keeps a stale file's mode and follows symlinks, so start from a fresh file.
+rm -f "$KEY"
+# `%b` expands `\n` sequences, so single-line keys from env vars work too.
+printf '%b\n' "$KEY_CONTENT" > "$KEY"
+echo "Successfully registered SSH key"

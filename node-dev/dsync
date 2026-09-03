@@ -2,16 +2,28 @@
 
 # Strict error handling.
 set -eu
-set -o pipefail
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: dsync <source> <destination>" >&2
+  exit 1
+fi
+
+# No `-z`: compression is useless between local paths.
+# Keep looping on failure, but say so: a silent broken sync looks healthy.
+sync() { rsync -aq --delete "$1" "$2" || echo "dsync: sync failed (rsync exit $?)" >&2; }
 
 # Synchronizes 2 directories or files in real time.
 while true; do
-  if [ -d "$1" ] || [ -f "$1" ]; then
-    # We perform a first copy to avoid having to wait for a change on the file / directory.
-    rsync -avzq --delete $1 $2 2>/dev/null || true
-    while inotifywait -r -q -e modify,create,delete,move $1; do
-      rsync -avzq --delete $1 $2 2>/dev/null || true
-    done &>/dev/null
+  if [ -e "$1" ]; then
+    # First copy, so we do not wait for a change before syncing.
+    sync "$1" "$2"
+    # `-m` keeps watches alive while rsync runs: events are queued, not lost.
+    # `close_write` instead of `modify`: never copy half-written files.
+    inotifywait -m -r -q -e close_write,create,delete,move "$1" | while read -r _; do
+      # Debounce: drain the burst for 200ms, then sync once.
+      while read -r -t 0.2 _; do :; done
+      sync "$1" "$2"
+    done
   fi
   sleep 3
 done

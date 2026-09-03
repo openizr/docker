@@ -1,16 +1,20 @@
 # node-dev
 
-This Docker image is a safer, nodeJS environment that allows you to install NPM dependencies
-from private git repositories, using SSH keys.
+This Docker image is a safer, non-root, Node.js environment, with extra development tools.
 *Use it only in a development environment, do not deploy it in production.*
+
+It runs as the `node` user (UID 1000). Derived images needing `apk` must switch to `USER root` first.
+
+`npm`, `yarn` and `pnpm` are available. `yarn` and `pnpm` are Corepack shims: they use the version
+pinned in the project's `packageManager` field (downloaded on first use), or the built-in one otherwise.
+
 
 ## Useful commands
 
-- `dsync path/to/source/directory path/to/dest/directory`: keep 2 directories synchronized in real-time using `rsync`
-- `register_ssh`: registers SSH keys from environment variables (automatically performed on start-up) - works with github.com and gitlab.com
+- `register_ssh < path/to/private_key`: writes the key to `~/.ssh/id_rsa` (also accepts `printf '%s' "$KEY" | register_ssh`)
+- `dsync path/to/source path/to/destination`: keep 2 directories or files synchronized in real-time using `rsync`
 
 
 ## Environment variables
 
-- *`SSH_PRIVATE_KEY`*: private SSH key used to authenticate against private git repositories (optional)
-- *`SSH_PUBLIC_KEY`*: public SSH key used to authenticate against private git repositories (optional)
+None.
