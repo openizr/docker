@@ -1,0 +1,22 @@
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+# Top of the `server` block, shared by both serving modes.
+
+listen      ${FRONTEND_PORT};
+listen [::]:${FRONTEND_PORT};
+server_name _;
+
+root /var/www/html/public;
+client_max_body_size ${MAX_BODY_SIZE};
+
+# Handles `X-Forwarded-For`.
+include /var/lib/nginx/generated/snippets/real-ip.conf;
+
+# Inherited by every location that does not add a header of its own.
+include /var/lib/nginx/generated/snippets/security-headers.conf;

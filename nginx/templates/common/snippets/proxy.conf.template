@@ -1,0 +1,39 @@
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+# `proxy_set_header` inherits like `add_header`: redefine it in each sub-location.
+proxy_http_version 1.1;
+
+# Empty `Connection` is required for the upstream keepalive pool: nginx would otherwise
+# send `Connection: close` and open a fresh TCP connection per request. `upgrade` only
+# for WebSocket handshakes, see `$upgrade_websocket`.
+proxy_set_header Upgrade    $upgrade_websocket;
+proxy_set_header Connection $connection_upgrade;
+
+# Each value is this listener's own view unless the peer matches TRUSTED_PROXIES.
+# No need for `X-Forwarded-Host`, `Host` is enough.
+proxy_set_header X-Real-IP         $remote_addr;
+proxy_set_header X-Forwarded-For   ${X_FORWARDED_FOR_VALUE};
+proxy_set_header X-Forwarded-Proto ${X_FORWARDED_PROTO_VALUE};
+proxy_set_header X-Forwarded-Port  ${X_FORWARDED_PORT_VALUE};
+
+# Back end fingerprints; `server_tokens off` already hides ours.
+proxy_hide_header X-Powered-By;
+proxy_hide_header X-AspNet-Version;
+proxy_hide_header X-AspNetMvc-Version;
+proxy_hide_header X-Runtime;
+
+# Response headers must fit in one buffer, or nginx answers 502.
+proxy_buffer_size       16k;
+proxy_buffers           8 16k;
+proxy_busy_buffers_size 32k;
+
+# Also the idle limit of a WebSocket: a connection silent for 60s is closed.
+proxy_connect_timeout 5s;
+proxy_send_timeout    60s;
+proxy_read_timeout    60s;

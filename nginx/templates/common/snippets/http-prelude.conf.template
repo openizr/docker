@@ -1,0 +1,61 @@
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+include /var/lib/nginx/generated/snippets/forwarded.conf;
+
+map $http_origin $cors_origin {
+  default                        "";
+  "~^(${CORS_ALLOWED_ORIGINS})$" $http_origin;
+}
+
+map $cors_origin $cors_credentials {
+  default "";
+  "~."    "true";
+}
+
+map $cors_origin $cors_exposed_headers {
+  default "";
+  "~."    "${CORS_EXPOSED_HEADERS}";
+}
+
+# Preflight-only headers.
+map "$request_method:$cors_origin" $cors_allowed_methods {
+  default        "";
+  "~^OPTIONS:."  "${CORS_ALLOWED_METHODS}";
+}
+
+map "$request_method:$cors_origin" $cors_allowed_headers {
+  default        "";
+  "~^OPTIONS:."  "${CORS_ALLOWED_HEADERS}";
+}
+
+map "$request_method:$cors_origin" $cors_max_age {
+  default        "";
+  "~^OPTIONS:."  "${CORS_MAX_AGE}";
+}
+
+# WebSocket only: another protocol (e.g. `h2c`) would turn nginx into a tunnel that
+# bypasses routing and limits. Empty otherwise, so the keepalive pool below keeps working.
+map $http_upgrade $upgrade_websocket {
+  default         "";
+  "~*^websocket$" websocket;
+}
+
+map $upgrade_websocket $connection_upgrade {
+  default   "";
+  websocket upgrade;
+}
+
+upstream backend {
+  server ${BACKEND_AUTHORITY};
+  keepalive 32;
+  # Must stay below the back end's idle timeout, or a connection it just closed is
+  # reused and the request fails with 502.
+  keepalive_timeout 60s;
+  keepalive_requests 1000;
+}

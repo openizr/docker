@@ -1,0 +1,65 @@
+#!/bin/sh
+
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+# Pre-compresses static assets so that `gzip_static` and `brotli_static` can serve
+# them without spending CPU per request.
+#
+# Run this from your image build, e.g.
+#
+#     COPY --chown=nginx:nginx ./dist /var/www/html/public
+#     RUN  precompress-assets /var/www/html/public
+
+set -eu -o pipefail
+
+root="${1:-/var/www/html/public}"
+[ -d "$root" ] || { echo "precompress-assets: no such directory: $root" >&2; exit 1; }
+
+# Matches `gzip_min_length`/`brotli_min_length`: below that, the output is often larger.
+min_size=1024
+
+# Each worker first drops the stale `.gz`/`.br` siblings of its file, which
+# would otherwise shadow it, then prints one `gz`, `br` or `err` line per file.
+#
+# See https://expeditedsecurity.com/blog/nginx-brotli/
+# woff/woff2 absent: already compressed. ttf and otf are not.
+find "$root" -type f \( \
+     -iname '*.css'  -o -iname '*.js'   -o -iname '*.mjs'  -o -iname '*.cjs'   \
+  -o -iname '*.json' -o -iname '*.txt'  -o -iname '*.html' -o -iname '*.htm'   \
+  -o -iname '*.xml'  -o -iname '*.svg'  -o -iname '*.ttf'  -o -iname '*.otf'   \
+  -o -iname '*.ico'  -o -iname '*.wasm' -o -iname '*.md'                       \
+  -o -iname '*.webmanifest' \
+  \) -print0 | xargs -0 -r -P "$(nproc 2>/dev/null || echo 1)" -n 16 sh -c '
+      min_size="$1"; shift
+      for file do
+        rm -f "$file.gz" "$file.br"
+        size=$(wc -c < "$file")
+        [ "$size" -ge "$min_size" ] || continue
+
+        # No `set -e`: one failure must not skip the rest of the batch.
+        gzip -9 -k -f "$file" || { echo err; continue; }
+        if [ "$(wc -c < "$file.gz")" -lt "$size" ]; then echo gz; else rm -f "$file.gz"; fi
+
+        brotli -q 11 -f -o "$file.br" "$file" || { echo err; continue; }
+        if [ "$(wc -c < "$file.br")" -lt "$size" ]; then echo br; else rm -f "$file.br"; fi
+      done
+    ' _ "$min_size" | {
+      gz=0
+      br=0
+      err=0
+      while read -r kind; do
+        case "$kind" in
+          gz)  gz=$((gz + 1)) ;;
+          br)  br=$((br + 1)) ;;
+          err) err=$((err + 1)) ;;
+        esac
+      done
+      echo "precompress-assets: done ($br brotli, $gz gzip, $err failed)"
+      [ "$err" -eq 0 ]
+    }
