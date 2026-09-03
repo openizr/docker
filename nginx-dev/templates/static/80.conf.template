@@ -1,0 +1,72 @@
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+# Static pages, development variant: fixed-name assets are not cached and source maps
+# are served. Anything not on disk is forwarded to the back end.
+#
+# Rendered into /var/lib/nginx/generated/80.conf and included from `http { }`, so
+# http-context directives are valid at the top of this file.
+
+include /var/lib/nginx/generated/snippets/http-prelude.conf;
+
+server {
+  include /var/lib/nginx/generated/snippets/server-preamble.conf;
+
+  # Back-end.
+  location @backend {
+    include /var/lib/nginx/generated/snippets/security-headers.conf;
+    include /var/lib/nginx/generated/snippets/cors.conf;
+
+    # Preflights never reach the back end.
+    if ($request_method = OPTIONS) { return 204; }
+
+    include /var/lib/nginx/generated/snippets/proxy.conf;
+    proxy_set_header Host $http_host;
+    proxy_pass http://backend;
+  }
+
+  # Entrypoint.
+  location = / {
+    expires epoch;
+    try_files /index.html @backend;
+  }
+
+  # Real .html files come from disk, but must always revalidate.
+  location ~* \.html?$ {
+    expires epoch;
+    try_files $uri @backend;
+  }
+
+  # A directory without index.html would answer 403.
+  location ~ /$ {
+    expires epoch;
+    try_files ${uri}index.html @backend;
+  }
+
+  # No cache here, as we want fresh updates in development mode.
+  location ~* ^/(favicon\.ico|robots\.txt|sitemap\.xml|humans\.txt|browserconfig\.xml|(service-worker|sw)\.js|apple-touch-icon[^/]*\.png|[^/]*\.webmanifest)$ {
+    expires epoch;
+    try_files $uri @backend;
+  }
+
+  # Longer caching for a specific file under it belongs in a per-project config.
+  location /.well-known/ {
+    expires epoch;
+    try_files $uri @backend;
+  }
+
+  # Static assets. Dotfiles are intentionally not protected at nginx level; this should rather be
+  # done in a custom config, per project.
+  location / {
+    expires ${STATIC_MAX_AGE};
+    try_files $uri @backend;
+  }
+
+  # Additional configuration.
+  include /etc/nginx/conf.d/extra.conf;
+}

@@ -1,0 +1,110 @@
+#
+# Copyright (c) Openizr. All Rights Reserved.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+#
+
+# Dynamic pages (SPA with optional pre-rendering), development variant: fixed-name assets
+# are not cached and source maps are served.
+#
+# Rendered into /var/lib/nginx/generated/80.conf and included from `http { }`, so
+# http-context directives are valid at the top of this file.
+
+include /var/lib/nginx/generated/snippets/http-prelude.conf;
+
+map $http_user_agent $is_bot {
+  default                0;
+  "~*${BOT_USER_AGENTS}" 1;
+}
+
+upstream prerenderer {
+  server ${PRERENDERER_AUTHORITY};
+  keepalive 8;
+}
+
+server {
+  include /var/lib/nginx/generated/snippets/server-preamble.conf;
+
+  # Health check. In static mode, the back end answers it.
+  location = /health {
+    access_log off;
+    default_type text/plain;
+    return 200 "ok\n";
+  }
+
+  # Back-end.
+  location ^~ /api/ {
+    include /var/lib/nginx/generated/snippets/security-headers.conf;
+    include /var/lib/nginx/generated/snippets/cors.conf;
+
+    # Preflights never reach the back end.
+    if ($request_method = OPTIONS) { return 204; }
+
+    include /var/lib/nginx/generated/snippets/proxy.conf;
+    proxy_set_header Host $http_host;
+    proxy_pass http://backend;
+  }
+
+  # App entrypoint.
+  location = / {
+    recursive_error_pages on;
+    error_page 404 = @shell;
+    return 404;
+  }
+
+  # Real .html files come from disk, but must always revalidate.
+  location ~* \.html?$ {
+    expires epoch;
+    try_files $uri @shell;
+  }
+
+  # A directory without index.html would answer 403.
+  location ~ /$ {
+    expires epoch;
+    try_files ${uri}index.html @shell;
+  }
+
+  # Handles pre-rendering and disables cache for entrypoints.
+  location @shell {
+    expires epoch;
+    if ($is_bot) { return 418; }
+    try_files /index.html =404;
+  }
+
+  # Reroutes the 418 above. Safe only because `proxy_intercept_errors` is off by default,
+  # which keeps a genuine 418 from the back end out of `@prerender`.
+  error_page 418 = @prerender;
+
+  # Pre-rendering, if enabled. Not rate limited: the pre-renderer serves its own cache,
+  # and volumetric abuse belongs to the WAF or load balancer in front.
+  location @prerender {
+    expires epoch;
+    include /var/lib/nginx/generated/snippets/proxy.conf;
+    proxy_set_header Host ${FRONTEND_HOST}:${FRONTEND_PORT};
+    proxy_pass http://prerenderer;
+  }
+
+  # No cache here, as we want fresh updates in development mode.
+  location ~* ^/(favicon\.ico|robots\.txt|sitemap\.xml|humans\.txt|browserconfig\.xml|(service-worker|sw)\.js|apple-touch-icon[^/]*\.png|[^/]*\.webmanifest)$ {
+    expires epoch;
+    try_files $uri @shell;
+  }
+
+  # Longer caching for a specific file under it belongs in a per-project config.
+  location /.well-known/ {
+    expires epoch;
+    try_files $uri @shell;
+  }
+
+  # Static assets. Dotfiles are intentionally not protected at nginx level; this should rather be
+  # done in a custom config, per project.
+  location / {
+    expires ${STATIC_MAX_AGE};
+    try_files $uri @shell;
+  }
+
+  # Additional configuration.
+  include /etc/nginx/conf.d/extra.conf;
+}

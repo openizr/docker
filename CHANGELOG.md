@@ -1,3 +1,176 @@
+## node:9.0.0 (2026-09-03)
+
+### Breaking changes
+- Upgrade `node` version to `26.8.1`
+- Run as numeric user `1000` instead of `node`
+- Switch to the Docker Hardened Image base (`dhi.io/node`)
+
+### Improvements
+- Replace the shell entrypoint with `docker-entrypoint.js`
+- Use base images digests and signed packages to prevent supply-chain attacks
+
+
+## node:9.0.0-dev (2026-09-03)
+
+### Breaking changes
+- Run as the non-root `node` user
+- Upgrade `node` version to `26.8.1`
+- Switch to the Docker Hardened Image base (`dhi.io/node`)
+- Remove `SSH_PRIVATE_KEY` and `SSH_PUBLIC_KEY` environment variables
+- Replace `ssh-keyscan` at start-up with `/etc/ssh/ssh_known_hosts`
+
+### Bugs
+- Fix `dsync` failing on paths containing spaces
+- Fix `register_ssh` replacing key newlines by spaces in the written key
+- Fix container silently exiting at start-up when offline and SSH keys are set
+
+### Improvements
+- Stop hiding `rsync` errors in `dsync`
+- Add `yarn` and `pnpm` through Corepack
+- Remove useless `rsync` compression in `dsync`
+- Remove network access and ~3s of latency from start-up
+
+
+## nginx:5.0.0 (2026-09-03)
+
+### Breaking changes
+- Change `CSP` default value
+- Run as the non-root `nginx` user
+- Upgrade `nginx` version to `1.31.4`
+- Change `FRONTEND_PORT` default value
+- Serve HTML with `Cache-Control: no-cache`
+- Remove `/health` location in static mode
+- Change `CORS_ALLOWED_ORIGINS` default value
+- Disable assets pre-compressing at container start
+- Write access and error logs in the container's streams
+- Switch to the Docker Hardened Image base (`dhi.io/nginx`)
+- Replace back end URL matching pattern to `/api/` instead of `/api`
+- Route `BACKEND_URI` and `PRERENDERER_URI` through `upstream` blocks
+- Never cache fixed-name assets such as `favicon.ico` or the service worker
+- Move configuration templates to `/etc/nginx/templates/{common,dynamic,static}/`
+- Move live configuration to `/var/lib/nginx/generated` rather than `/etc/nginx/conf.d`
+- Validate every environment variable at start-up, making invalid value abort the container
+
+### Features
+- Add new `precompress-assets` script
+- Add new `HSTS` environment variable
+- Add new `CORS_MAX_AGE` environment variable
+- Add new `MAX_BODY_SIZE` environment variable
+- Add new `STATIC_MAX_AGE` environment variable
+- Add new `TRUSTED_PROXIES` environment variable
+- Add new `PERMISSIONS_POLICY` environment variable
+- Add new `CORS_EXPOSED_HEADERS` environment variable
+- Add new `PRECOMPRESSED_ASSETS_DIRECTORY` environment variable
+- Add new `Permissions-Policy` and `Cross-Origin-Opener-Policy` headers in responses
+
+### Bugs
+- Fix CORS origin regex
+- Fix MIME types list for compressed assets
+- Fix files pattern for assets pre-compression
+- Fix main `index.html` entrypoint cache policy
+- Fix `Host` sent to the back end losing its port
+- Fix the back end receiving no proxy headers at all
+- Fix sourcemaps location pattern that was too broad
+- Fix `.cjs` files served as `application/octet-stream`
+- Fix systematic TCP connection reopening on each request
+- Fix `gzip_vary` parameter always sending compressed assets
+- Correctly clean existing assets before pre-compressing new ones
+- Fix an invalid CORS preflight response containing `Content-Length` on a `204`
+- Fix main-context errors (worker crashes, `setrlimit` failures) not reaching `stderr`
+- Fix empty `BOT_USER_AGENTS` or `CORS_ALLOWED_ORIGINS` matching all values by default
+- Fix a directory without `index.html` answering `403` instead of the application shell
+- Fix missing `Vary: Origin` on responses containing `Access-Control-Allow-Origin` header
+- Fix an untrusted peer's `X-Forwarded-For` being forwarded when `TRUSTED_PROXIES` is set
+- Add `worker_rlimit_nofile`, without which `worker_connections` could exceed the descriptor limit
+
+### Improvements
+- Raise `proxy_buffer_size` to `16k`
+- Remove deprecated `Expect-CT` header
+- Forward `Upgrade` for WebSocket only
+- Log upstream response time and request time
+- Move `server_tokens off` to the `http` context
+- Replace `envsubst` with a shell renderer, dropping `gettext`
+- Drop back end fingerprint headers such as `X-Powered-By`
+- Send preflight-only CORS headers on `OPTIONS` responses only
+- Deduplicate the security and CORS headers into included snippets
+- Raise `keepalive_requests` to nginx's own current default of 1000
+- Derive `worker_processes` from the cgroup CPU quota instead of `auto`
+- Prevent supply chain attacks using nginx and brotli official signatures
+- Document `X-Accel-Buffering: no` for streams and the pre-renderer user agent loop
+- Document that the back end idle timeout must exceed the 60s keepalive pool
+- Add Slowloris-relevant timeouts, `open_file_cache`, `absolute_redirect off` and `port_in_redirect off`
+
+
+## nginx:5.0.0-dev (2026-09-03)
+
+### Breaking changes
+- Update `CSP` default value
+- Run as the non-root `nginx` user
+- Raise `error_log` level to `info`
+- Upgrade `nginx` version to `1.31.4`
+- Change `FRONTEND_PORT` default value
+- Serve HTML with `Cache-Control: no-cache`
+- Remove `/health` location in static mode
+- Update `CORS_ALLOWED_ORIGINS` default value to `""`
+- Write access and error logs in the container's streams
+- Switch to the Docker Hardened Image base (`dhi.io/nginx`)
+- Replace back end URL matching pattern to `/api/` instead of `/api`
+- Route `BACKEND_URI` and `PRERENDERER_URI` through `upstream` blocks
+- Disable `sendfile`, `gzip_static`, `brotli_static` and `open_file_cache`
+- Never cache fixed-name assets such as `favicon.ico` or the service worker
+- Move configuration templates to `/etc/nginx/templates/{common,dynamic,static}/`
+- Move live configuration to `/var/lib/nginx/generated` rather than `/etc/nginx/conf.d`
+- Validate every environment variable at start-up, making invalid value abort the container
+
+### Features
+- Add new `precompress-assets` script
+- Add new `HSTS` environment variable
+- Add new `CORS_MAX_AGE` environment variable
+- Add new `MAX_BODY_SIZE` environment variable
+- Add new `STATIC_MAX_AGE` environment variable
+- Add new `TRUSTED_PROXIES` environment variable
+- Add new `PERMISSIONS_POLICY` environment variable
+- Add new `CORS_EXPOSED_HEADERS` environment variable
+- Add new `PRECOMPRESSED_ASSETS_DIRECTORY` environment variable
+- Add new `Permissions-Policy` and `Cross-Origin-Opener-Policy` headers in responses
+
+### Bugs
+- Fix CORS origin regex
+- Fix MIME types list for compressed assets
+- Fix files pattern for assets pre-compression
+- Fix main `index.html` entrypoint cache policy
+- Fix `Host` sent to the back end losing its port
+- Fix the back end receiving no proxy headers at all
+- Fix `.cjs` files served as `application/octet-stream`
+- Fix systematic TCP connection reopening on each request
+- Fix `gzip_vary` parameter always sending compressed assets
+- Correctly clean existing assets before pre-compressing new ones
+- Fix an invalid CORS preflight response containing `Content-Length` on a `204`
+- Fix main-context errors (worker crashes, `setrlimit` failures) not reaching `stderr`
+- Fix empty `BOT_USER_AGENTS` or `CORS_ALLOWED_ORIGINS` matching all values by default
+- Fix a directory without `index.html` answering `403` instead of the application shell
+- Fix missing `Vary: Origin` on responses containing `Access-Control-Allow-Origin` header
+- Fix an untrusted peer's `X-Forwarded-For` being forwarded when `TRUSTED_PROXIES` is set
+- Add `worker_rlimit_nofile`, without which `worker_connections` could exceed the descriptor limit
+
+### Improvements
+- Raise `proxy_buffer_size` to `16k`
+- Remove deprecated `Expect-CT` header
+- Forward `Upgrade` for WebSocket only
+- Log upstream response time and request time
+- Move `server_tokens off` to the `http` context
+- Replace `envsubst` with a shell renderer, dropping `gettext`
+- Drop back end fingerprint headers such as `X-Powered-By`
+- Send preflight-only CORS headers on `OPTIONS` responses only
+- Deduplicate the security and CORS headers into included snippets
+- Raise `keepalive_requests` to nginx's own current default of 1000
+- Derive `worker_processes` from the cgroup CPU quota instead of `auto`
+- Prevent supply chain attacks using nginx and brotli official signatures
+- Document `X-Accel-Buffering: no` for streams and the pre-renderer user agent loop
+- Document that the back end idle timeout must exceed the 60s keepalive pool
+- Add Slowloris-relevant timeouts, `open_file_cache`, `absolute_redirect off` and `port_in_redirect off`
+
+
 ## node:8.0.1-dev (2025-01-31)
 
 ### Bugs
