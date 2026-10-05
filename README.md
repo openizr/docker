@@ -23,7 +23,7 @@ Images are independent: each directory holds its own Dockerfile and a complete R
 Pull a tag from Docker Hub and read the image README for its environment variables and entrypoint behavior:
 
 ```sh
-docker pull openizr/nginx:5.0.0
+docker pull openizr/nginx:5.0.1
 docker pull openizr/node:9.0.0-dev
 ```
 

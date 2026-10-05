@@ -1,3 +1,15 @@
+## nginx:5.0.1 (2026-10-05)
+
+### Improvements
+- Upgrade `nginx` version to `1.31.6`
+
+
+## nginx:5.0.1-dev (2026-10-05)
+
+### Improvements
+- Upgrade `nginx` version to `1.31.6`
+
+
 ## node:9.0.0 (2026-09-03)
 
 ### Breaking changes
