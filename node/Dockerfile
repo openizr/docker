@@ -6,7 +6,7 @@
 #
 #
 
-FROM dhi.io/node:26.8.1-alpine3.24-dev@sha256:568938d6b7b45704a4bd6b86604bbd3363623d7505875449ba431bb7cd6f0796 AS dumb-init
+FROM dhi.io/node:26.12.1-alpine3.24-dev@sha256:0614d22bcdfe1f5fbf985e68b455e61aefba8bc697894a6e91a8542a3e5f26b4 AS dumb-init
 
 # See https://github.com/Yelp/dumb-init.
 RUN apk add --no-cache dumb-init
@@ -14,7 +14,7 @@ RUN apk add --no-cache dumb-init
 RUN mkdir -p /var/www/html
 
 
-FROM dhi.io/node:26.8.1-alpine3.24@sha256:33c8aa3a66d8b227e75e8bec0a8c8a022cfcd96e0732d6e4abdde13e574ba1e7
+FROM dhi.io/node:26.12.1-alpine3.24@sha256:9d778a01d260a1b9d9656e6ca289e9a352def10b255f85e23050a5c71a6cd42e
 
 ENV NODE_ENV=production
 

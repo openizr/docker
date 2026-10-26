@@ -24,7 +24,7 @@ Pull a tag from Docker Hub and read the image README for its environment variabl
 
 ```sh
 docker pull openizr/nginx:5.0.1
-docker pull openizr/node:9.0.0-dev
+docker pull openizr/node:9.0.1-dev
 ```
 
 

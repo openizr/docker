@@ -1,3 +1,15 @@
+## node:9.0.1 (2026-10-26)
+
+### Improvements
+- Upgrade `node` version to `26.12.1`
+
+
+## node:9.0.1-dev (2026-10-26)
+
+### Improvements
+- Upgrade `node` version to `26.12.1`
+
+
 ## nginx:5.0.1 (2026-10-05)
 
 ### Improvements
