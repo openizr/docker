@@ -1,3 +1,16 @@
+## nginx:5.0.2 (2026-11-06)
+
+### Improvements
+- Upgrade `nginx` version to `1.31.8`
+- Upgrade `ngx_brotli` to bundle `brotli` `1.2.1`
+
+
+## nginx:5.0.2-dev (2026-11-06)
+
+### Improvements
+- Upgrade `nginx` version to `1.31.8`
+
+
 ## node:9.0.1 (2026-10-26)
 
 ### Improvements

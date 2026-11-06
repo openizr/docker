@@ -6,7 +6,7 @@
 #
 #
 
-FROM openizr/nginx:5.0.1@sha256:67e0d081812e16cc9a8bba6b53c898fb2e384ce39e32d8d68cf61eb0dbd4ac74
+FROM openizr/nginx:5.0.2@sha256:7a5d6bd3021b1a4c63c826d0c58196341f2b40b8aed76907bb8051a0b3eae16d
 
 ENV HSTS=""
 ENV MAX_BODY_SIZE=64m
